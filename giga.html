@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIGACraft</title>
+    <link rel="stylesheet" href="GIGACraft.css">
+</head>
+<body>
+    <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
+    <div id="splash-screen" class="screen-modal" style="display: flex;">
+        <div class="splash-content">
+            <div class="splash-title">shibakoWords</div>
+            <div class="splash-loading">
+                <div id="splash-progress" class="splash-progress" style="width: 0%;"></div>
+            </div>
+            <div class="splash-text">LOADING...</div>
+        </div>
+    </div>
+
+    <!-- ГЛАВНОЕ МЕНЮ -->
+    <div id="main-menu" class="screen-modal" style="display: none;">
+        <h1 style="font-size: 70px; text-shadow: 4px 4px #3f3f3f; color: #ffdb3c; text-align: center;">GIGACraft</h1>
+        <button class="mc-button" onclick="Engine.showWorldCreation()">Одиночная игра</button>
+        <button class="mc-button" onclick="Engine.toggleSettings(true)">Настройки</button>
+        <button class="mc-button" onclick="window.close()">Выход</button>
+    </div>
+
+    <!-- ОКНО СОЗДАНИЯ МИРА -->
+    <div id="screen-start" class="screen-modal" style="display: none;">
+        <h1 style="font-size: 70px; text-shadow: 4px 4px #3f3f3f; color: #ffdb3c; text-align: center;">GIGACraft<br><span style="font-size: 24px; color: #fff;">Beta v1.0.67</span></h1>
+        
+        <div class="world-size-selector">
+            <div class="selector-title">Выберите размер мира:</div>
+            <label class="world-option">
+                <input type="radio" name="worldSize" value="30"> Маленький (быстрый)
+            </label>
+            <label class="world-option">
+                <input type="radio" name="worldSize" value="60" checked> Средний
+            </label>
+            <label class="world-option">
+                <input type="radio" name="worldSize" value="90"> Большой
+            </label>
+        </div>
+
+        <div class="world-size-selector">
+            <div class="selector-title">Выберите сложность:</div>
+            <label class="world-option">
+                <input type="radio" name="difficulty" value="easy"> Лёгкая (меньше урон, быстрее реген)
+            </label>
+            <label class="world-option">
+                <input type="radio" name="difficulty" value="normal" checked> Нормальная
+            </label>
+            <label class="world-option">
+                <input type="radio" name="difficulty" value="hard"> Сложная (больше урон, голод)
+            </label>
+        </div>
+
+        <button class="mc-button" onclick="Engine.createNewWorld()">СОЗДАТЬ НОВЫЙ МИР</button>
+        <button class="mc-button" onclick="Engine.showMainMenu()">Назад</button>
+        <button class="mc-button" onclick="alert('Controls: WASD + Space, 1-6 Switch, E Inventory, P Settings, Mouse Click, Shift+RMB to eat')">How to Play</button>
+    </div>
+
+    <!-- ИНВЕНТАРЬ -->
+    <div id="inventory-menu" class="screen-modal" style="display: none;">
+        <div id="close-inventory" class="close-button">X</div>
+        <div class="quest-title">INVENTORY</div>
+        <div class="craft-area">
+            <div id="craft-slot-1" class="craft-slot"></div>
+            <div class="craft-arrow">→</div>
+            <div id="craft-slot-2" class="craft-slot"></div>
+            <div class="craft-arrow">+</div>
+            <div id="craft-result" class="craft-slot result"></div>
+        </div>
+        <div id="inventory-list"></div>
+    </div>
+
+    <!-- МЕНЮ НАСТРОЕК -->
+    <div id="settings-menu" class="screen-modal" style="display: none;">
+        <div id="close-settings" class="close-button">X</div>
+        <div class="quest-title">SETTINGS</div>
+        <div class="setting-item">
+            <label>Mouse Sensitivity: <span id="sens-value">1.0</span></label>
+            <input type="range" id="sensitivity" min="0.2" max="2.0" step="0.1" value="1.0">
+        </div>
+        <div class="setting-item">
+            <label>Render Distance: <span id="render-value">60</span></label>
+            <input type="range" id="render-distance" min="30" max="90" step="10" value="60">
+        </div>
+        <div class="setting-item">
+            <label>Качество графики:</label>
+            <select id="quality-select">
+                <option value="low">Низкое</option>
+                <option value="medium" selected>Среднее</option>
+                <option value="high">Высокое</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ИНТЕРФЕЙС ПЕЧИ -->
+    <div id="furnace-menu" class="screen-modal" style="display: none;">
+        <div id="close-furnace" class="close-button">X</div>
+        <div class="quest-title">FURNACE</div>
+        <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0;">
+            <div id="fuel-slot" class="craft-slot"></div>
+            <div id="input-slot" class="craft-slot"></div>
+            <div class="craft-arrow">→</div>
+            <div id="output-slot" class="craft-slot result"></div>
+        </div>
+        <div style="width: 200px; height: 20px; background: #333; margin: 20px auto; border: 2px solid #000;">
+            <div id="furnace-progress-bar" style="height: 100%; width: 0%; background: #ffaa00;"></div>
+        </div>
+    </div>
+
+    <div id="menu" class="menu-blur"></div>
+
+    <div id="game-overlay">
+        <div id="crosshair">+</div>
+        
+        <div id="ui-top-left">
+            <div class="minecraft-font">Score: <span id="ui-score">0</span></div>
+        </div>
+
+        <!-- Блок с заданиями УДАЛЁН -->
+
+        <div id="achievement-toast">
+            <div class="toast-title">Ачивка получена</div>
+            <div id="toast-name" class="toast-name">Выполнено!</div>
+        </div>
+
+        <div id="health-section"></div>
+
+        <!-- Шкала голода -->
+        <div id="hunger-section">
+            <div id="hunger-bar"></div>
+        </div>
+
+        <div id="bow-charge-container">
+            <div id="charge-1" class="charge-section"></div>
+            <div id="charge-2" class="charge-section"></div>
+            <div id="charge-3" class="charge-section"></div>
+        </div>
+
+        <!-- ГОРЯЧАЯ ПАНЕЛЬ С 6 СЛОТАМИ -->
+        <div id="hotbar-container">
+            <div id="slot-1" class="hotbar-slot selected">Меч</div>
+            <div id="slot-2" class="hotbar-slot">Лук</div>
+            <div id="slot-3" class="hotbar-slot">Топор</div>
+            <div id="slot-4" class="hotbar-slot">Лопата</div>
+            <div id="slot-5" class="hotbar-slot"></div>
+            <div id="slot-6" class="hotbar-slot"></div>
+        </div>
+
+        <div id="screen-death" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); flex-direction: column; align-items: center; justify-content: center; z-index: 100; pointer-events: all;">
+            <h1 style="color: #ff3333; font-size: 80px; margin-bottom: 20px; text-shadow: 0 0 20px #ff0000;">YOU DEAD</h1>
+            <div id="death-stats" style="font-size: 24px; margin-bottom: 30px; text-align: center; color: #aaa;"></div>
+            <button onclick="location.reload()" style="padding: 15px 40px; font-size: 24px; background: #ff3333; color: white; border: none; cursor: pointer; border-radius: 5px; font-family: inherit; box-shadow: 0 0 15px rgba(255,0,0,0.5);">RESPAWN</button>
+        </div>
+    </div>
+
+    <div id="achievements-menu">
+        <div id="close-achievements" onclick="Engine.toggleAchievements(false)">X</div>
+        <div class="quest-title" style="font-size: 30px;">PROGRESS</div>
+        <div id="achievements-list"></div>
+    </div>
+
+    <!-- ЭКРАН ПАУЗЫ -->
+    <div id="screen-pause" class="screen-modal" style="display: none;">
+        <h1 style="font-size: 60px;">PAUSED</h1>
+        <button class="mc-button" onclick="Engine.requestLock()">Continue</button>
+        <button class="mc-button" onclick="Engine.toggleSettings(true)">Settings</button>
+        <button class="mc-button" onclick="Engine.exitToMenu()">Exit to Menu</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.155.0/three.min.js"></script>
+    <script src="gigacraft.js"></script>
+</body>
+</html>
