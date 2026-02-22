@@ -1,0 +1,613 @@
+/* GIGACraft.css */
+
+/* ========== БАЗОВЫЕ СТИЛИ ========== */
+body { 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; 
+    background-color: #050505; 
+    font-family: 'Courier New', Courier, monospace; 
+    user-select: none; 
+    color: #ffffff;
+}
+canvas { display: block; }
+
+/* ========== ИНТЕРФЕЙС ========== */
+#menu {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: radial-gradient(circle, rgba(255, 254, 254, 0.2) 0%, rgba(0,0,0,0.7) 100%), 
+                      url('GIGAtexture/камень/камень.bmp');
+    background-repeat: repeat;
+    background-size: 64px;
+    image-rendering: pixelated;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 99;
+    pointer-events: none;
+}
+.menu-blur { backdrop-filter: blur(10px); transition: opacity 0.5s; }
+
+#game-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ЭКРАН СМЕРТИ */
+#screen-death {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: all !important;
+}
+#screen-death button {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+#ui-top-left {
+    position: absolute;
+    top: 20px; left: 20px;
+    background: rgba(0,0,0,0.5);
+    padding: 20px;
+    border: 4px solid #373737;
+}
+.minecraft-font {
+    font-size: 24px;
+    text-shadow: 2px 2px #3f3f3f;
+    color: #ffffff;
+    margin: 5px 0;
+}
+
+/* УВЕДОМЛЕНИЕ О ДОСТИЖЕНИИ */
+#achievement-toast {
+    position: fixed;
+    top: 50%;
+    right: -400px;
+    width: 300px;
+    background: #2a2a2a;
+    border: 4px solid #ffff55;
+    padding: 15px;
+    z-index: 3000;
+    transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+#achievement-toast.show { right: 20px; }
+.toast-title {
+    color: #ffff55;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+.toast-name { color: #ffffff; font-size: 18px; }
+
+/* СЕРДЦА */
+#health-section {
+    position: absolute;
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+.heart {
+    width: 18px; height: 18px;
+    background-color: #ff5555;
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+    mask-repeat: no-repeat; mask-size: contain;
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+    -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain;
+    transition: background-color 0.5s ease, filter 0.5s ease;
+}
+.heart.empty {
+    background-color: #ffffff;
+    filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+    opacity: 0.3;
+}
+
+/* ПОЛОСКА ГОЛОДА */
+#hunger-section {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 20px;
+    background: #555;
+    border: 2px solid #000;
+    box-shadow: inset -2px -2px #404040, inset 2px 2px #e0e0e0;
+}
+#hunger-bar {
+    height: 100%;
+    width: 100%;
+    background: #f0d060;
+    transition: width 0.2s;
+    box-shadow: inset -2px -2px #404040, inset 2px 2px #e0e0e0;
+}
+
+/* ГОРЯЧАЯ ПАНЕЛЬ (6 слотов) */
+#hotbar-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    background: #8b8b8b;
+    padding: 4px;
+    border: 4px solid #373737;
+}
+.hotbar-slot {
+    width: 60px; height: 60px;
+    border: 4px solid #373737;
+    margin: 0 2px;
+    background: #8b8b8b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    box-shadow: inset -2px -2px #404040, inset 2px 2px #e0e0e0;
+    transition: 0.1s;
+}
+.hotbar-slot.selected {
+    border-color: #ffffff;
+    box-shadow: inset 0 0 10px #ffffff, inset -2px -2px #404040, inset 2px 2px #e0e0e0;
+}
+.hotbar-slot:empty::before {
+    content: "⛆";
+    color: #aaa;
+    font-size: 24px;
+    opacity: 0.5;
+}
+
+/* ИНДИКАТОР ЗАРЯДА ЛУКА */
+#bow-charge-container {
+    position: absolute;
+    top: 55%; left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    gap: 3px;
+    background: rgba(0,0,0,0.2);
+    padding: 3px;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+.charge-section {
+    width: 25px; height: 4px;
+    background: rgba(255,255,255,0.1);
+    transition: background 0.2s;
+}
+.charge-section.active { background: #55ff55; }
+
+/* МЕНЮ И МОДАЛКИ */
+.screen-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.mc-button {
+    width: 400px;
+    padding: 20px;
+    margin: 10px;
+    background: #6e6e6e;
+    color: #ffffff;
+    border: 4px solid #000;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: inset -4px -4px #404040, inset 4px 4px #e0e0e0;
+    pointer-events: auto;
+    text-align: center;
+}
+.mc-button:hover {
+    background: #7d7d7d;
+    border-color: #ffffff;
+}
+
+/* СТАРТОВЫЙ ЭКРАН С ВЫБОРОМ МИРА */
+.world-size-selector {
+    background: rgba(0,0,0,0.5);
+    border: 4px solid #8b8b8b;
+    padding: 20px;
+    margin: 20px 0;
+    width: 400px;
+    color: #fff;
+    font-size: 20px;
+}
+.selector-title {
+    margin-bottom: 15px;
+    color: #ffff55;
+}
+.world-option {
+    display: block;
+    margin: 10px 0;
+    cursor: pointer;
+}
+.world-option input {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+/* МЕНЮ ДОСТИЖЕНИЙ */
+#achievements-menu {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px; height: 600px;
+    background: #2a2a2a;
+    border: 6px solid #1a1a1a;
+    z-index: 2000;
+    padding: 20px;
+    pointer-events: auto;
+}
+#close-achievements {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 35px; height: 35px;
+    background: #ff5555;
+    border: 3px solid #000;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#achievements-list {
+    margin-top: 40px;
+    height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+#achievements-list::-webkit-scrollbar { width: 10px; }
+#achievements-list::-webkit-scrollbar-track { background: #1a1a1a; }
+#achievements-list::-webkit-scrollbar-thumb { background: #555; border: 2px solid #1a1a1a; }
+
+.achievement-card {
+    background: #4a4a4a;
+    border: 3px solid #000;
+    padding: 15px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+    transition: 0.3s;
+}
+.achievement-card.unlocked {
+    opacity: 1;
+    border-color: #ffff55;
+    box-shadow: 0 0 10px rgba(255,255,85,0.3);
+}
+.achievement-name { color: #ffff55; font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+.achievement-desc { font-size: 14px; color: #ddd; }
+
+#crosshair {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* ИНДИКАТОР РАЗРУШЕНИЯ БЛОКА */
+#break-progress {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: 100px;
+    height: 10px;
+    background: #333;
+    border: 2px solid #fff;
+    display: none;
+    z-index: 20;
+}
+#break-fill {
+    height: 100%;
+    width: 0%;
+    background: #fff;
+}
+
+/* ========== КРАСИВЫЙ ИНВЕНТАРЬ ========== */
+#inventory-menu {
+    background: rgba(30,30,30,0.95);
+    border: 8px solid #4a4a4a;
+    box-shadow: inset 0 0 0 2px #2a2a2a, 0 10px 20px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 30px;
+    width: 600px;
+    max-width: 90vw;
+    color: #eee;
+    font-family: 'Courier New', monospace;
+    image-rendering: pixelated;
+}
+#inventory-menu .quest-title {
+    font-size: 32px;
+    color: #ffdb3c;
+    text-shadow: 3px 3px 0 #3f3f3f;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #8b8b8b;
+    padding-bottom: 10px;
+}
+#close-inventory {
+    position: absolute;
+    top: 15px; right: 15px;
+    width: 40px; height: 40px;
+    background: #a55;
+    border: 4px solid #633;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset -2px -2px #633, inset 2px 2px #d88;
+    transition: 0.1s;
+}
+#close-inventory:hover { background: #c77; }
+
+.craft-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+    background: rgba(0,0,0,0.3);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #5f5f5f;
+}
+.craft-slot {
+    width: 70px; height: 70px;
+    background: #6e6e6e;
+    border: 4px solid #373737;
+    box-shadow: inset -3px -3px #404040, inset 3px 3px #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000;
+    font-size: 14px;
+    transition: 0.1s;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+.craft-slot:hover {
+    background: #7d7d7d;
+    border-color: #ffff55;
+    transform: scale(1.05);
+}
+.craft-slot.result {
+    border-color: #ffff55;
+    box-shadow: inset -3px -3px #404040, inset 3px 3px #e0e0e0, 0 0 15px #ffdb3c;
+}
+.craft-arrow {
+    font-size: 40px;
+    color: #aaa;
+    text-shadow: 2px 2px 0 #3f3f3f;
+}
+
+#inventory-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(20,20,20,0.7);
+    border: 4px solid #4a4a4a;
+    border-radius: 8px;
+}
+.inventory-slot {
+    background: #5a5a5a;
+    border: 3px solid #2f2f2f;
+    box-shadow: inset -2px -2px #3f3f3f, inset 2px 2px #aaa;
+    padding: 12px 5px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    cursor: pointer;
+    transition: 0.1s;
+    word-break: break-word;
+}
+.inventory-slot:hover {
+    background: #7a7a7a;
+    border-color: #ffdb3c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+}
+.inventory-slot:empty::before {
+    content: "⛆";
+    color: #aaa;
+    font-size: 20px;
+    opacity: 0.5;
+}
+
+/* ========== МЕНЮ НАСТРОЕК ========== */
+#settings-menu {
+    background: rgba(30,30,30,0.95);
+    border: 8px solid #4a4a4a;
+    box-shadow: inset 0 0 0 2px #2a2a2a, 0 10px 20px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 30px;
+    width: 500px;
+    max-width: 90vw;
+    color: #eee;
+    font-family: 'Courier New', monospace;
+    image-rendering: pixelated;
+}
+#settings-menu .quest-title {
+    font-size: 32px;
+    color: #ffdb3c;
+    text-shadow: 3px 3px 0 #3f3f3f;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #8b8b8b;
+    padding-bottom: 10px;
+}
+#close-settings {
+    position: absolute;
+    top: 15px; right: 15px;
+    width: 40px; height: 40px;
+    background: #a55;
+    border: 4px solid #633;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset -2px -2px #633, inset 2px 2px #d88;
+    transition: 0.1s;
+}
+#close-settings:hover { background: #c77; }
+
+.setting-item {
+    margin: 20px 0;
+    text-align: left;
+    font-size: 20px;
+}
+.setting-item label { display: block; margin-bottom: 10px; }
+.setting-item input[type=range] {
+    width: 100%;
+    height: 10px;
+    background: #6e6e6e;
+    border: 2px solid #373737;
+    outline: none;
+    -webkit-appearance: none;
+}
+.setting-item input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 30px;
+    background: #e0e0e0;
+    border: 2px solid #000;
+    box-shadow: inset -2px -2px #404040, inset 2px 2px #fff;
+    cursor: pointer;
+}
+#sens-value, #render-value {
+    color: #ffdb3c;
+    font-weight: bold;
+}
+
+/* ========== СТИЛИ ДЛЯ SELECT ========== */
+.setting-item select {
+    width: 100%;
+    padding: 10px;
+    background: #6e6e6e;
+    color: white;
+    border: 4px solid #373737;
+    font-family: inherit;
+    font-size: 18px;
+    box-shadow: inset -2px -2px #404040, inset 2px 2px #e0e0e0;
+    cursor: pointer;
+}
+.setting-item select option {
+    background: #4a4a4a;
+    color: white;
+}
+
+/* ========== ЗАГРУЗОЧНЫЙ ЭКРАН ========== */
+#splash-screen {
+    background: #000;
+    z-index: 10000;
+}
+.splash-content {
+    text-align: center;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    image-rendering: pixelated;
+}
+.splash-title {
+    font-size: 80px;
+    color: #ffdb3c;
+    text-shadow: 6px 6px 0 #3f3f3f, 2px 2px 0 #000;
+    margin-bottom: 40px;
+    animation: pulse 1.5s infinite;
+}
+.splash-loading {
+    width: 400px;
+    height: 30px;
+    background: #333;
+    border: 4px solid #8b8b8b;
+    margin: 20px auto;
+    padding: 3px;
+}
+.splash-progress {
+    width: 0%;
+    height: 100%;
+    background: #55ff55;
+    transition: width 0.3s;
+    box-shadow: inset -2px -2px #404040, inset 2px 2px #e0e0e0;
+}
+.splash-text {
+    font-size: 24px;
+    color: #aaa;
+    text-shadow: 2px 2px 0 #000;
+    letter-spacing: 4px;
+}
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* ========== ИНТЕРФЕЙС ПЕЧИ ========== */
+#furnace-menu {
+    background: rgba(30,30,30,0.95);
+    border: 8px solid #4a4a4a;
+    box-shadow: inset 0 0 0 2px #2a2a2a, 0 10px 20px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 30px;
+    width: 500px;
+    max-width: 90vw;
+    color: #eee;
+    font-family: 'Courier New', monospace;
+    image-rendering: pixelated;
+}
+#furnace-menu .quest-title {
+    font-size: 32px;
+    color: #ffdb3c;
+    text-shadow: 3px 3px 0 #3f3f3f;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #8b8b8b;
+    padding-bottom: 10px;
+}
+#close-furnace {
+    position: absolute;
+    top: 15px; right: 15px;
+    width: 40px; height: 40px;
+    background: #a55;
+    border: 4px solid #633;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset -2px -2px #633, inset 2px 2px #d88;
+    transition: 0.1s;
+}
+#close-furnace:hover { background: #c77; }
